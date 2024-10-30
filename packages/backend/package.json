@@ -43,7 +43,6 @@
     "@backstage/plugin-techdocs-backend": "^1.11.0",
     "@humanitec/backstage-plugin-backend": "^0.8.2",
     "@humanitec/backstage-plugin-scaffolder-backend-module": "^0.5.2",
-    "@internal/backstage-plugin-account-vending-backend": "^0.1.0",
     "app": "link:../app",
     "better-sqlite3": "^9.0.0",
     "node-gyp": "^10.0.0",
