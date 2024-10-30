@@ -33,11 +33,20 @@ spec:
   # These steps are executed in the scaffolder backend, using data that we gathered
   # via the parameters above.
   steps:
-    # Each step executes an action, in this case one templates files into the working directory.
-    - id: submit-request
-      name: Submit
-      action: humanitec.submitAccountRequest
+    - id: fetch-base
+      name: Fetch Base
+      action: fetch:template
       input:
-        accountName: ${{ parameters.accountName }}
-        environment: ${{ parameters.environment }}
-        ownerEmail: ${{ parameters.ownerEmail }}
+        url: ./content
+        values:
+          accountName: ${{ parameters.accountName }}
+          environment: ${{ parameters.environment }}
+          ownerEmail: ${{ parameters.ownerEmail }}
+    # Each step executes an action, in this case one templates files into the working directory.
+    # - id: submit-request
+    #   name: Submit
+    #   action: humanitec.submitAccountRequest
+    #   input:
+    #     accountName: ${{ parameters.accountName }}
+    #     environment: ${{ parameters.environment }}
+    #     ownerEmail: ${{ parameters.ownerEmail }}
