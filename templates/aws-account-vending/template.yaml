@@ -12,24 +12,28 @@ spec:
   # These parameters are used to generate the input form in the frontend, and are
   # used to gather input data for the execution of the template.
   parameters: 
-  - title: AWS Account Name
-    description: Enter the name for the new AWS Account
-    required: true
-    type: string
-    name: accountName
-  - title: Environment
-    description: Select the env for this account
-    required: true
-    name: environment
-    enum:
-      - dev
-      - test
-      - prod
-  - title: Owner Email
-    description: Enter the email address of the account owner
-    required: true
-    type: string
-    name: ownerEmail
+  - title: Fill in required steps
+    required:
+      - accountName
+      - ownerEmail
+      - environment
+    properties:
+      accountName:
+        title: AWS Account
+        description: Enter the name for the new AWS Account
+        type: string
+      environment:
+        title: Environment
+        description: Select the env for this account
+        enum:
+          - dev
+          - test
+          - prod
+      ownerEmail:
+        title: AWS Account Owner
+        description: Enter the email address of the AWS Account Owner
+        type: email
+
   # These steps are executed in the scaffolder backend, using data that we gathered
   # via the parameters above.
   steps:
