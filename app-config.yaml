@@ -55,6 +55,10 @@ catalog:
       rules:
         - allow: [Template]
     - type: file
+      target: ../../templates/aws-account-vending/template.yaml
+      rules:
+        - allow: [Template]
+    - type: file
       target: ../../examples/org.yaml
       rules:
         - allow: [User, Group]
