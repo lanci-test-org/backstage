@@ -32,7 +32,7 @@ spec:
       ownerEmail:
         title: AWS Account Owner
         description: Enter the email address of the AWS Account Owner
-        type: email
+        type: string
 
   # These steps are executed in the scaffolder backend, using data that we gathered
   # via the parameters above.

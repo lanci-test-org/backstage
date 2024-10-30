@@ -19,6 +19,7 @@ auth:
       dangerouslyAllowOutsideDevelopment: true
 
 catalog:
+  orphanStrategy: delete
   rules:
     - allow: [Component, System, API, Resource, Location]
   locations:
