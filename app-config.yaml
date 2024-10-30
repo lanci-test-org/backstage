@@ -39,27 +39,26 @@ auth:
     guest: {}
 
 scaffolder:
-
-catalog:
-  rules:
-    - allow: [Component, System, API, Resource, Location, Template]
-  locations:
-    - type: file
-      target: ../../catalog-info.yaml
-    - type: file
-      target: ../../templates/node-service/template.yaml
-      rules:
-        - allow: [Template]
-    - type: file
-      target: ../../templates/podinfo-example/template.yaml
-      rules:
-        - allow: [Template]
-    - type: file
-      target: ../../templates/aws-account-vending/template.yaml
-    - type: file
-      target: ../../examples/org.yaml
-      rules:
-        - allow: [User, Group]
+  catalog:
+    rules:
+      - allow: [Component, System, API, Resource, Location, Template]
+    locations:
+      - type: file
+        target: ../../catalog-info.yaml
+      - type: file
+        target: ../../templates/node-service/template.yaml
+        rules:
+          - allow: [Template]
+      - type: file
+        target: ../../templates/podinfo-example/template.yaml
+        rules:
+          - allow: [Template]
+      - type: file
+        target: ../../templates/aws-account-vending/template.yaml
+      - type: file
+        target: ../../examples/org.yaml
+        rules:
+          - allow: [User, Group]
 
 humanitec:
   orgId: ${HUMANITEC_ORG_ID}
