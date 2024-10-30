@@ -37,6 +37,10 @@ spec:
   # These steps are executed in the scaffolder backend, using data that we gathered
   # via the parameters above.
   steps:
+    - name: Read Environment
+      id: environment
+      action: humanitec:get-environment
+      
     - id: fetch-base
       name: Fetch Base
       action: fetch:template
