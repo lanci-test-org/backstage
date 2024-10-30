@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Template
+metadata:
+  name: aws-account-vending
+  title: AWS Account Vending Request
+  description: An example of AWS Account Vending
+  owner: platform-team@example.com
+spec:
+  type: service
