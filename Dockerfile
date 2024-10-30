@@ -89,7 +89,7 @@ yarn install --frozen-lockfile --production --network-timeout 600000
 COPY --from=build --chown=node:node /app/packages/backend/dist/bundle/ ./
 
 # Copy any other files that we need at runtime
-COPY --chown=node:node app-config.yaml ./
+COPY --chown=node:node app-config.yaml app-config.production.yaml ./
 COPY --chown=node:node catalog-info.yaml ./
 COPY --chown=node:node templates templates
 COPY --chown=node:node examples examples
