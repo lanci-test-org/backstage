@@ -48,4 +48,5 @@ backend.add(import('@humanitec/backstage-plugin-backend'));
 backend.add(import('@humanitec/backstage-plugin-scaffolder-backend-module'));
 
 
+backend.add(import('@internal/backstage-plugin-account-vending-backend'));
 backend.start();
