@@ -1,0 +1,36 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: aws-account-vending
+  title: AWS Account Vending Request
+  description: Request a new AWS account via AFT
+spec:
+  owner: platform-team@example.com
+  type: service
+parameters: 
+  - title: AWS Account Name
+    description: Enter the name for the new AWS Account
+    required: true
+    type: string
+    name: accountName
+  - title: Environment
+    description: Select the env for this account
+    required: true
+    name: environment
+    enum:
+      - dev
+      - test
+      - prod
+  - title: Owner Email
+    description: Enter the email address of the account owner
+    required: true
+    type: string
+    name: ownerEmail
+steps: 
+  - id: create-account
+    name: Submit Account Request
+    action: humanitec.submitAccountRequest
+    input: 
+      accountName: ${{ parameters.accountName }}
+      environment: ${{ parameters.environment }}
+      ownerEmail: ${{ parameters.ownerEmail }}
