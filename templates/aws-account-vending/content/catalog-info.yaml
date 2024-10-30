@@ -1,11 +1,9 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: ${{values.name | dump}}
-  description: ${{values.description | dump}}
-  annotations:
-    github.com/project-slug: ${{values.destination.owner + "/" + values.destination.repo}}
+  name: aws-${{values.accountName | dump}}
+  description: AWS Account ${{values.accountName | dump}}-${{values.environment | dump}}
 spec:
   type: documentation
   lifecycle: experimental
-  owner: ${{values.owner | dump}}
+  owner: ${{values.ownerEmail | dump}}
