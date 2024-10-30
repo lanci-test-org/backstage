@@ -1,75 +1,162 @@
+# apiVersion: scaffolder.backstage.io/v1beta3
+# # https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+# kind: Template
+# metadata:
+#   name: aws-account-vending
+#   title: AWS Account Vending Request
+#   description: Request a new AWS account via AFT
+# spec:
+#   owner: user:guest
+#   type: service
+
+#   # These parameters are used to generate the input form in the frontend, and are
+#   # used to gather input data for the execution of the template.
+#   parameters: 
+#   - title: AWS Account Name
+#     description: Enter the name for the new AWS Account
+#     required: true
+#     type: string
+#     name: accountName
+#   - title: Environment
+#     description: Select the env for this account
+#     required: true
+#     name: environment
+#     enum:
+#       - dev
+#       - test
+#       - prod
+#   - title: Owner Email
+#     description: Enter the email address of the account owner
+#     required: true
+#     type: string
+#     name: ownerEmail
+#   # These steps are executed in the scaffolder backend, using data that we gathered
+#   # via the parameters above.
+#   steps:
+#     - id: fetch-base
+#       name: Fetch Base
+#       action: fetch:template
+#       input:
+#         url: ./content
+#         values:
+#           accountName: ${{ parameters.accountName }}
+#           environment: ${{ parameters.environment }}
+#           ownerEmail: ${{ parameters.ownerEmail }}
+#     - id: publish
+#       name: Publish
+#       action: publish:github
+#       input:
+#         allowedHosts: ['github.com']
+#         defaultBranch: main
+#         description: This is ${{ parameters.accountName }}
+#         repoUrl: github.com?owner=${{ steps.environment.output.githubOrgId }}&repo=${{ parameters.accountName }}
+#     - id: register
+#       name: Register
+#       action: catalog:register
+#       input:
+#         repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+#         catalogInfoPath: '/catalog-info.yaml'
+
+#     # Each step executes an action, in this case one templates files into the working directory.
+#     # - id: submit-request
+#     #   name: Submit
+#     #   action: humanitec.submitAccountRequest
+#     #   input:
+#     #     accountName: ${{ parameters.accountName }}
+#     #     environment: ${{ parameters.environment }}
+#     #     ownerEmail: ${{ parameters.ownerEmail }}
+
+#   output:
+#       links:
+#         - title: Repository
+#           url: ${{ steps['publish'].output.remoteUrl }}
+#         - title: Open in catalog
+#           icon: catalog
+#           entityRef: ${{ steps['register'].output.entityRef }}
 apiVersion: scaffolder.backstage.io/v1beta3
-# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
 kind: Template
 metadata:
-  name: aws-account-vending
-  title: AWS Account Vending Request
-  description: Request a new AWS account via AFT
+  name: docs-template
+  title: Documentation Template
+  description: Create a new standalone documentation project
+  tags:
+    - recommended
+    - techdocs
+    - mkdocs
 spec:
-  owner: user:guest
-  type: service
+  owner: my-awesome-team
+  type: documentation
 
-  # These parameters are used to generate the input form in the frontend, and are
-  # used to gather input data for the execution of the template.
-  parameters: 
-  - title: AWS Account Name
-    description: Enter the name for the new AWS Account
-    required: true
-    type: string
-    name: accountName
-  - title: Environment
-    description: Select the env for this account
-    required: true
-    name: environment
-    enum:
-      - dev
-      - test
-      - prod
-  - title: Owner Email
-    description: Enter the email address of the account owner
-    required: true
-    type: string
-    name: ownerEmail
-  # These steps are executed in the scaffolder backend, using data that we gathered
-  # via the parameters above.
+  parameters:
+    - title: Fill in some steps
+      required:
+        - name
+        - description
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name of the component
+          ui:field: EntityNamePicker
+          ui:autofocus: true
+        description:
+          title: Description
+          type: string
+          description: A description for the component
+        owner:
+          title: Owner
+          type: string
+          description: Owner of the component
+          ui:field: OwnerPicker
+          ui:options:
+            allowedKinds:
+              - Group
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - github.com
+
+  # This template is meant to be used on top of an existing template.
+  # By adding the following and fetching from an absolute URL you can
+  # add in the docs template
   steps:
-    - id: fetch-base
-      name: Fetch Base
+    - id: fetch
+      name: Template Docs Skeleton
       action: fetch:template
       input:
-        url: ./content
+        url: ./skeleton
         values:
-          accountName: ${{ parameters.accountName }}
-          environment: ${{ parameters.environment }}
-          ownerEmail: ${{ parameters.ownerEmail }}
+          name: ${{ parameters.name }}
+          description: ${{ parameters.description }}
+          destination: ${{ parameters.repoUrl | parseRepoUrl }}
+          owner: ${{ parameters.owner }}
+
     - id: publish
       name: Publish
       action: publish:github
       input:
         allowedHosts: ['github.com']
-        defaultBranch: main
-        description: This is ${{ parameters.accountName }}
-        repoUrl: github.com?owner=${{ steps.environment.output.githubOrgId }}&repo=${{ parameters.accountName }}
+        description: This is ${{ parameters.name }}
+        repoUrl: ${{ parameters.repoUrl }}
+
     - id: register
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        repoContentsUrl: ${{ steps.publish.output.repoContentsUrl }}
         catalogInfoPath: '/catalog-info.yaml'
 
-    # Each step executes an action, in this case one templates files into the working directory.
-    # - id: submit-request
-    #   name: Submit
-    #   action: humanitec.submitAccountRequest
-    #   input:
-    #     accountName: ${{ parameters.accountName }}
-    #     environment: ${{ parameters.environment }}
-    #     ownerEmail: ${{ parameters.ownerEmail }}
-
   output:
-      links:
-        - title: Repository
-          url: ${{ steps['publish'].output.remoteUrl }}
-        - title: Open in catalog
-          icon: catalog
-          entityRef: ${{ steps['register'].output.entityRef }}
+    links:
+      - title: Repository
+        url: ${{ steps.publish.output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps.register.output.entityRef }}

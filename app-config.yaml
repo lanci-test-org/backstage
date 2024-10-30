@@ -41,7 +41,7 @@ auth:
 scaffolder:
   catalog:
     rules:
-      - allow: [Component, System, API, Resource, Location, Template]
+      - allow: [Component, System, API, Resource, Location]
     locations:
       - type: file
         target: ../../catalog-info.yaml
@@ -55,6 +55,8 @@ scaffolder:
           - allow: [Template]
       - type: file
         target: ../../templates/aws-account-vending/template.yaml
+        rules:
+          - allow: [Template]
       - type: file
         target: ../../examples/org.yaml
         rules:
