@@ -1,75 +1,43 @@
 apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
 kind: Template
 metadata:
-  name: nodejs-service-template
-  title: NodeJS Service Template
-  description: An example template that creates a simple Hello World service
-  tags:
-    - score
-    - humanitec
+  name: aws-account-vending
+  title: AWS Account Vending Request
+  description: Request a new AWS account via AFT
 spec:
   owner: user:guest
   type: service
 
-  parameters:
-    - title: New NodeJS Service
-      required:
-        - componentName
-      properties:
-        componentName:
-          title: Component Name
-          type: string
-          description: Unique name of the project
-          ui:autofocus: true
-          ui:options:
-            rows: 5
-          ui:field: ValidateHumanitecAppID
-
+  # These parameters are used to generate the input form in the frontend, and are
+  # used to gather input data for the execution of the template.
+  parameters: 
+  - title: AWS Account Name
+    description: Enter the name for the new AWS Account
+    required: true
+    type: string
+    name: accountName
+  - title: Environment
+    description: Select the env for this account
+    required: true
+    name: environment
+    enum:
+      - dev
+      - test
+      - prod
+  - title: Owner Email
+    description: Enter the email address of the account owner
+    required: true
+    type: string
+    name: ownerEmail
+  # These steps are executed in the scaffolder backend, using data that we gathered
+  # via the parameters above.
   steps:
-    - name: Read Environment
-      id: environment
-      action: humanitec:get-environment
-
-    - id: fetch-base
-      name: Fetch Base
-      action: fetch:template
+    # Each step executes an action, in this case one templates files into the working directory.
+    - id: submit-request
+      name: Submit
+      action: humanitec.submitAccountRequest
       input:
-        url: ./content
-        values:
-          name: ${{ parameters.componentName }}
-          image: ${{ parameters.componentName }}
-          orgId: ${{ steps.environment.output.orgId }}
-          cloudProvider: ${{ steps.environment.output.cloudProvider }}
-
-    - id: publish
-      name: Publish
-      action: publish:github
-      input:
-        allowedHosts: ['github.com']
-        defaultBranch: main
-        description: This is ${{ parameters.componentName }}
-        repoUrl: github.com?owner=${{ steps.environment.output.githubOrgId }}&repo=${{ parameters.componentName }}
-        repoVisibility: public
-        protectDefaultBranch: false
-        oidcCustomization: ${{ steps.environment.output.githubOIDCCustomization }}
-
-    - id: humanitec-create-app
-      name: Create Humanitec App
-      action: humanitec:create-app
-      input:
-        appId: ${{ parameters.componentName }}
-
-    - id: register
-      name: Register
-      action: catalog:register
-      input:
-        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
-        catalogInfoPath: '/catalog-info.yaml'
-
-  output:
-    links:
-      - title: Repository
-        url: ${{ steps['publish'].output.remoteUrl }}
-      - title: Open in catalog
-        icon: catalog
-        entityRef: ${{ steps['register'].output.entityRef }}
+        accountName: ${{ parameters.accountName }}
+        environment: ${{ parameters.environment }}
+        ownerEmail: ${{ parameters.ownerEmail }}
