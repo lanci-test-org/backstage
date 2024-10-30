@@ -42,7 +42,7 @@ scaffolder:
 
 catalog:
   rules:
-    - allow: [Component, System, API, Resource, Location]
+    - allow: [Component, System, API, Resource, Location, Template]
   locations:
     - type: file
       target: ../../catalog-info.yaml
