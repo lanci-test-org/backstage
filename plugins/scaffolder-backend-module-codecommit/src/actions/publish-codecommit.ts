@@ -51,6 +51,16 @@ export function codeCommitAction() {
     async handler(ctx) {
       const { directoryPath } = ctx.input;
 
+      ctx.logger.info(`directoryPath from input ${directoryPath}`);
+
+      const currDir = process.cwd()
+      const filesAndDirs = fs.readdirSync(currDir);
+      filesAndDirs.forEach((fileOrDir) => {
+        const fullPath = path.join(currDir, fileOrDir);
+        const isDirectory = fs.statSync(fullPath).isDirectory();
+        ctx.logger.info(`${fileOrDir} - ${isDirectory ? 'Directory' : 'File'}`);
+      });
+
       const stsClient = new STSClient({ region: 'us-east-1' });
       const assumeRoleCommand = new AssumeRoleCommand({
         RoleArn: 'arn:aws:iam::082144427333:role/backstage-codecommit-account-vending', 
