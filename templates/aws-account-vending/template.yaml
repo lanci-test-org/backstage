@@ -59,7 +59,7 @@ spec:
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        repoContentsUrl: https://codecommit.amazonaws.com
         catalogInfoPath: '/catalog-info.yaml'
 
     # Each step executes an action, in this case one templates files into the working directory.
