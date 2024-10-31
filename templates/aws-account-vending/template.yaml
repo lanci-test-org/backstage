@@ -55,7 +55,7 @@ spec:
       action: codecommit:actions:commit
       input:
         ownerEmail: 'mlanci@example.com'
-        directoryPath: '/path/to/something'
+        directoryPath: './templates/aws-account-vending/content/'
     - id: register
       name: Register
       action: catalog:register
