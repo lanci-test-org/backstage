@@ -49,4 +49,5 @@ backend.add(import('@humanitec/backstage-plugin-scaffolder-backend-module'));
 
 // backend.add(import('@backstage/plugin-scaffolder-backend')); 
 
+backend.add(import('backstage-plugin-scaffolder-backend-module-codecommit'));
 backend.start();
