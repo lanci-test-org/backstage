@@ -55,7 +55,7 @@ spec:
       action: codecommit:actions:commit
       input:
         ownerEmail: 'mlanci@example.com'
-        directoryPath: ${{ steps.fetch-base.output.targetPath }}
+        directoryPath: '/path/to/something'
     - id: register
       name: Register
       action: catalog:register
