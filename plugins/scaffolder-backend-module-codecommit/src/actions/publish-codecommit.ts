@@ -40,7 +40,9 @@ export function codeCommitAction() {
       }
     },
     async handler(ctx) {
-      const stsClient = new STSClient({});
+      const stsClient = new STSClient({
+        region: 'us-east-1',
+      });
       try {
         const command = new GetCallerIdentityCommand({});
         const response = await stsClient.send(command);
