@@ -64,9 +64,6 @@ export function codeCommitAction() {
       const command = new GetCallerIdentityCommand({});
       const response = await stsClient.send(command);
       ctx.logger.info(`AWS Caller ID: ${JSON.stringify(response)}`);
-      ctx.output('Account', response.Account);
-      ctx.output('Arn', response.Arn);
-      ctx.output('UserId', response.UserId);
 
       const codeCommitClient = new CodeCommitClient({
         region: 'us-east-1',
