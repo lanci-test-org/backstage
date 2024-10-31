@@ -47,6 +47,6 @@ backend.add(import('@backstage/plugin-scaffolder-backend-module-gitea'));
 backend.add(import('@humanitec/backstage-plugin-backend'));
 backend.add(import('@humanitec/backstage-plugin-scaffolder-backend-module'));
 
-// backend.add(import('@backstage/plugin-scaffolder-backend'));
+// backend.add(import('@backstage/plugin-scaffolder-backend')); 
 
 backend.start();
