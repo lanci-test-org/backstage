@@ -1,9 +1,9 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: aws-${{values.accountName | dump}}
-  description: AWS Account ${{values.accountName | dump}}-${{values.environment | dump}}
+  name: aws-${{values.accountName}}
+  description: AWS Account ${{values.accountName}}-${{values.environment}}
 spec:
-  type: documentation
+  type: aws-account
   lifecycle: experimental
-  owner: ${{values.ownerEmail | dump}}
+  owner: ${{values.ownerEmail}}

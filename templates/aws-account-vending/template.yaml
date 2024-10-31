@@ -52,12 +52,9 @@ spec:
           ownerEmail: ${{ parameters.ownerEmail }}
     - id: publish
       name: Publish
-      action: publish:github
+      action: codecommit:actions:commit
       input:
-        allowedHosts: ['github.com']
-        defaultBranch: main
-        description: This is ${{ parameters.accountName }}
-        repoUrl: github.com?owner=${{ steps.environment.output.githubOrgId }}&repo=${{ parameters.accountName }}
+        ownerEmail: ['mlanci@example.com']
     - id: register
       name: Register
       action: catalog:register
