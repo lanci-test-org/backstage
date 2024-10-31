@@ -1,6 +1,6 @@
 import { createTemplateAction } from '@backstage/plugin-scaffolder-node';
 import { STSClient, GetCallerIdentityCommand, AssumeRoleCommand } from '@aws-sdk/client-sts';
-import { CodeCommitClient, CreateCommitCommand, GetBranchCommand, PutFileCommand } from '@aws-sdk/client-codecommit';
+import { CodeCommitClient, CreateCommitCommand, GetBranchCommand } from '@aws-sdk/client-codecommit';
 import fs from 'fs';
 import path from 'path';
 
