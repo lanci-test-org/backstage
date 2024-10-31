@@ -8,6 +8,7 @@ describe('createExampleAction', () => {
     await expect(action.handler(createMockActionContext({
       input: {
         ownerEmail: 'test',
+        directoryPath: 'testPath'
       },
     }))).resolves.toBeUndefined()
   });
@@ -18,6 +19,7 @@ describe('createExampleAction', () => {
     await expect(action.handler(createMockActionContext({
       input: {
         ownerEmail: 'foo',
+        directoryPath: 'testPath'
       },
     }))).rejects.toThrow("ownerEmail cannot be 'foo'")
   });
