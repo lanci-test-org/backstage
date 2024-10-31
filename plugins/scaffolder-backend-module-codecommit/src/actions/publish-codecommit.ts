@@ -1,5 +1,5 @@
 import { createTemplateAction } from '@backstage/plugin-scaffolder-node';
-import { STSClient, GetCallerIdentityCommand } from '@aws-sdk/client-sts';
+import { STSClient, GetCallerIdentityCommand, AssumeRoleCommand } from '@aws-sdk/client-sts';
 import { CodeCommitClient, PutFileCommand } from '@aws-sdk/client-codecommit';
 import fs from 'fs';
 import path from 'path';
@@ -51,7 +51,26 @@ export function codeCommitAction() {
     async handler(ctx) {
       const { directoryPath } = ctx.input;
 
-      const codeCommitClient = new CodeCommitClient({ region: 'us-east-1'})
+      const stsClient = new STSClient({ region: 'us-east-1' });
+      const assumeRoleCommand = new AssumeRoleCommand({
+        RoleArn: 'arn:aws:iam::082144427333:role/backstage-codecommit-account-vending', 
+        RoleSessionName: 'Backstage-CrossAccount'
+      });
+
+      const assumedRole = await stsClient.send(assumeRoleCommand);
+
+      const { AccessKeyId, SecretAccessKey, SessionToken } = assumedRole.Credentials!;
+
+
+
+      const codeCommitClient = new CodeCommitClient({
+        region: 'us-east-1',
+        credentials: {
+          accessKeyId: AccessKeyId!,
+          secretAccessKey: SecretAccessKey!,
+          sessionToken: SessionToken!
+        }
+      });
 
       const readFilesRecursively = (dir: string): Array<{path: string, content: Buffer }> => {
         const files: Array<{ path: string, content: Buffer }> = [];
