@@ -1,6 +1,6 @@
 import { createTemplateAction } from '@backstage/plugin-scaffolder-node';
 import { STSClient, GetCallerIdentityCommand, AssumeRoleCommand } from '@aws-sdk/client-sts';
-import { CodeCommitClient, PutFileCommand } from '@aws-sdk/client-codecommit';
+import { CodeCommitClient, CreateCommitCommand, GetBranchCommand, PutFileCommand } from '@aws-sdk/client-codecommit';
 import fs from 'fs';
 import path from 'path';
 
@@ -19,6 +19,8 @@ export function codeCommitAction() {
   return createTemplateAction<{
     ownerEmail: string;
     directoryPath: string;
+    accountName: string;
+    environment: string;
   }>({
     id: 'codecommit:actions:commit',
     description: 'Pushes code to AFTs codecommit repository',
@@ -37,6 +39,16 @@ export function codeCommitAction() {
             description: 'The directory path of the files to be committed to codecommit',
             type: 'string',
           },
+          accountName: {
+            title: 'Account Name',
+            description: 'Account name of the AWS account. This will be used to form the name like this example: nhl-{accountName}-{environment}',
+            type: 'string',
+          },
+          environment: {
+            title: 'Environment',
+            description: 'The environment for account',
+            type: 'string'
+          }
         },
       },
       output: {
@@ -49,7 +61,7 @@ export function codeCommitAction() {
       }
     },
     async handler(ctx) {
-      const { directoryPath } = ctx.input;
+      const { directoryPath, accountName, environment, ownerEmail } = ctx.input;
 
       ctx.logger.info(`directoryPath from input ${directoryPath}`);
 
@@ -84,38 +96,106 @@ export function codeCommitAction() {
         }
       });
 
-      const readFilesRecursively = (dir: string): Array<{path: string, content: Buffer }> => {
-        const files: Array<{ path: string, content: Buffer }> = [];
-        const items = fs.readdirSync(dir, { withFileTypes: true });
+      // const readFilesRecursively = (dir: string): Array<{path: string, content: Buffer }> => {
+      //   const files: Array<{ path: string, content: Buffer }> = [];
+      //   const items = fs.readdirSync(dir, { withFileTypes: true });
 
-        for (const item of items) {
-          const fullPath = path.join(dir, item.name);
-          if (item.isDirectory()) {
-            files.push(...readFilesRecursively(fullPath));
-          } else {
-            files.push({
-              path: path.relative(directoryPath, fullPath),
-              content: fs.readFileSync(fullPath)
-            });
+      //   for (const item of items) {
+      //     const fullPath = path.join(dir, item.name);
+      //     if (item.isDirectory()) {
+      //       files.push(...readFilesRecursively(fullPath));
+      //     } else {
+      //       files.push({
+      //         path: path.relative(directoryPath, fullPath),
+      //         content: fs.readFileSync(fullPath)
+      //       });
+      //     }
+      //   }
+      //   return files;
+      // };
+
+      // const filesToCommit = readFilesRecursively(directoryPath);
+
+      const fileName = `${accountName}.tf`
+      const fileContent = `
+        # Managed by Backstage
+        module "aft_${accountName}_account" {
+          source = "./modules/aft-account-request"
+
+          control_tower_parameters = {
+            AccountEmail = "awsadmin+aws-${accountName}-${environment}@nhl.com"
+            AccountName  = "nhl-${accountName}-${environment}"
+            # Syntax for top-level OU
+            ManagedOrganizationalUnit = "ControlTowerOnboard"
+            # Syntax for nested OU
+            # ManagedOrganizationalUnit = "Sandbox (ou-xfe5-a8hb8ml8)"
+            SSOUserEmail     = "awsadmin+aws-${accountName}-${environment}@nhl.com"
+            SSOUserFirstName = "Admin"
+            SSOUserLastName  = "User"
+          }
+
+          account_tags = {
+            "ABC:Owner"       = "${ownerEmail}"
+          }
+
+          change_management_parameters = {
+            change_requested_by = "${ownerEmail}
+            change_reason       = "New account creation for ${accountName} project by Backstage"
           }
         }
-        return files;
-      };
+      `.trim();
 
-      const filesToCommit = readFilesRecursively(directoryPath);
+      const tempDir = '/tmp/codecommit-changes';
+      const filePath = path.join(tempDir, fileName);
 
-      for (const file of filesToCommit) {
-        const putFileCommand = new PutFileCommand({
-          repositoryName: 'lanci-testing-respository',
-          branchName: 'main',
-          filePath: file.path,
-          fileContent: file.content,
-          commitMessage: `Adding ${file.path}`,
-        });
-
-        await codeCommitClient.send(putFileCommand);
-        ctx.logger.info(`Commited ${file.path} to lanci-testing-respository`);
+      if (!fs.existsSync(tempDir)) {
+        fs.mkdirSync(tempDir);
       }
+      fs.writeFileSync(filePath, fileContent);
+
+      const branchName = 'main';
+      const getBranchCommand = new GetBranchCommand({
+        repositoryName: 'lanci-testing-respository',
+        branchName,
+      });
+      const branchData = await codeCommitClient.send(getBranchCommand);
+      const parentCommitId = branchData.branch?.commitId;
+
+      if (!parentCommitId) {
+        throw new Error(`Could not retrieve parent commit ID for branch ${branchName}`);
+      }
+
+      const createCommitCommand = new CreateCommitCommand({
+        repositoryName: 'lanci-testing-respository',
+        branchName,
+        parentCommitId,
+        putFiles: [
+          {
+            filePath: fileName,
+            fileContent: Buffer.from(fileContent),
+          },
+        ],
+        commitMessage: `Adding ${fileName} for account ${accountName}`,
+        authorName: ownerEmail,
+        email: ownerEmail
+      });
+
+      const commitResponse = await codeCommitClient.send(createCommitCommand);
+      ctx.logger.info(`Commit successful: ${commitResponse.commitId}`);
+
+      
+      // for (const file of filesToCommit) {
+      //   const putFileCommand = new PutFileCommand({
+      //     repositoryName: 'lanci-testing-respository',
+      //     branchName: 'main',
+      //     filePath: file.path,
+      //     fileContent: file.content,
+      //     commitMessage: `Adding ${file.path}`,
+      //   });
+
+      //   await codeCommitClient.send(putFileCommand);
+      //   ctx.logger.info(`Commited ${file.path} to lanci-testing-respository`);
+      // }
       // const stsClient = new STSClient({
       //   region: 'us-east-1',
       // });

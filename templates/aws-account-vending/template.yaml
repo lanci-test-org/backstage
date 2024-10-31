@@ -20,7 +20,7 @@ spec:
     properties:
       accountName:
         title: AWS Account
-        description: Enter the name for the new AWS Account
+        description: Account name of the AWS account. This will be used to form the name like this nhl-{accountName}-{environment}
         type: string
       environment:
         title: Environment
@@ -55,7 +55,9 @@ spec:
       action: codecommit:actions:commit
       input:
         ownerEmail: 'mlanci@example.com'
+        accountName: ${{ parameters.accountName }}
         directoryPath: './templates/aws-account-vending/content/'
+        environment: ${{ parameters.environment }}
     - id: register
       name: Register
       action: catalog:register

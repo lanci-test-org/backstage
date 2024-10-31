@@ -1,5 +1,3 @@
-# ${{ values.name }}
+# ${{ values.accountName }}
 
-${{ values.description }}
-
-Owned by ${{ values.owner }}
+Owned by ${{ values.ownerEmail }}
