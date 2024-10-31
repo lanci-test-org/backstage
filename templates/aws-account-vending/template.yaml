@@ -60,7 +60,7 @@ spec:
       name: Register
       action: catalog:register
       input:
-        repoContentsUrl: https://codecommit.amazonaws.com
+        repoContentsUrl: git-codecommit.us-east-1.amazonaws.com/v1/repos/lanci-testing-respository
         catalogInfoPath: '/catalog-info.yaml'
 
     # Each step executes an action, in this case one templates files into the working directory.
