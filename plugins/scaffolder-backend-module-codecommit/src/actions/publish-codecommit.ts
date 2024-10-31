@@ -61,7 +61,12 @@ export function codeCommitAction() {
 
       const { AccessKeyId, SecretAccessKey, SessionToken } = assumedRole.Credentials!;
 
-
+      const command = new GetCallerIdentityCommand({});
+      const response = await stsClient.send(command);
+      ctx.logger.info(`AWS Caller ID: ${JSON.stringify(response)}`);
+      ctx.output('Account', response.Account);
+      ctx.output('Arn', response.Arn);
+      ctx.output('UserId', response.UserId);
 
       const codeCommitClient = new CodeCommitClient({
         region: 'us-east-1',
@@ -108,12 +113,7 @@ export function codeCommitAction() {
       //   region: 'us-east-1',
       // });
       // try {
-      //   const command = new GetCallerIdentityCommand({});
-      //   const response = await stsClient.send(command);
-      //   ctx.logger.info(`AWS Caller ID: ${JSON.stringify(response)}`);
-      //   ctx.output('Account', response.Account);
-      //   ctx.output('Arn', response.Arn);
-      //   ctx.output('UserId', response.UserId);
+
       // } catch (error) {
       //   ctx.logger.error(`Failed to retrieve credentials ${error}`);
       //   throw error;
