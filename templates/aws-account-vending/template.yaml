@@ -54,7 +54,7 @@ spec:
       name: Publish
       action: codecommit:actions:commit
       input:
-        ownerEmail: ['mlanci@example.com']
+        ownerEmail: 'mlanci@example.com'
     - id: register
       name: Register
       action: catalog:register
